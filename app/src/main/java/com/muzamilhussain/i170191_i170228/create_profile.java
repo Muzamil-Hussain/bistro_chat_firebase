@@ -224,9 +224,6 @@ public class create_profile extends AppCompatActivity {
 
 
                 if (isPictureUploaded || (imageUri.toString().equals(checkUri.toString()))) {
-                    Toast.makeText(create_profile.this,
-                            imageUri.toString(),
-                            Toast.LENGTH_LONG).show();
                     userProfile newUserProfile = new userProfile(firstName.getText().toString().trim(),
                             lastName.getText().toString().trim(),
                             dob.getText().toString(),

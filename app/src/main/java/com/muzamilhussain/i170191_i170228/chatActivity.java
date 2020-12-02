@@ -203,68 +203,6 @@ public class chatActivity extends AppCompatActivity {
         });
 
 
-//        chatReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    //chatMessages.clear();
-//                    String latestKey = null;
-////                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-////                        chatMessages.add(data.getValue(message.class));
-////                        latestKey = data.getKey();
-////                    }
-//                    if (!chatMessages.get(chatMessages.size()-1).getSenderId().equals(currentUser.getUid())) {
-//
-//                        for (int i=0;i<chatMessages.size();i++) {
-//                            if (!chatMessages.get(i).getSenderId().equals(currentUser.getUid())) {
-//                                chatMessages.get(i).setIsSeen("true");
-//                            }
-//                        }
-//                        chatReference
-//                                .child(latestKey)
-//                                .child("isSeen").
-//                                setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                chatMessages.get(chatMessages.size() - 1).setIsSeen("true");
-//                            }
-//                        });
-//                    }
-//                    chatAdapter adapter = new chatAdapter(chatMessages, chatActivity.this);
-//                    RecyclerView.LayoutManager lm = new LinearLayoutManager(chatActivity.this);
-//                    ((LinearLayoutManager) lm).setStackFromEnd(true);
-//                    messageRecyclerView.setLayoutManager(lm);
-//                    messageRecyclerView.setAdapter(adapter);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
-
-//        chatReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//
-//                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                        chatMessages.add(data.getValue(message.class));
-//                        chatMessages.get(chatMessages.size()-1).setId(data.getKey());
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Toast.makeText(chatActivity.this,
-//                        "Failed to retrieve messages",
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        });
-
 
         back_btn_ac.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -365,6 +303,8 @@ public class chatActivity extends AppCompatActivity {
                                                 finalMsg);
                                         //chatReference.push().setValue(singleMessage);
                                         chatReference.push().setValue(singleMessage);
+                                        Toast.makeText(chatActivity.this,
+                                                "Sending...",Toast.LENGTH_LONG).show();
                                     }
                                 });
                             }

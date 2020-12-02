@@ -103,21 +103,21 @@
         android:background="@drawable/gender_rectangle_button" >
 
         <LinearLayout
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginHorizontal="10dp">
 
             <ImageButton
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background="@drawable/ic_photo_camera_black_24dp"
                 android:id="@+id/select_image_ac" />
         </LinearLayout>
 
 
         <EditText
-            android:layout_width="220dp"
+            android:layout_width="210dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="10dp"
             android:background="@null"
@@ -133,8 +133,8 @@
             android:layout_marginEnd="10dp">
 
             <ImageButton
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background="@drawable/send_msg"
                 android:id="@+id/send_msg_ac"
                 />

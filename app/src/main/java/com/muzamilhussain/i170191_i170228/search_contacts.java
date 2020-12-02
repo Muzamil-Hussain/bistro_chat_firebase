@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -65,12 +66,21 @@ public class search_contacts extends AppCompatActivity {
                     userProfile userProfileData = data.getValue(userProfile.class);
                     for (int i=0 ;i<contactNumbersList.size();i++) {
                         if (userProfileData.getPhoneNumber().equals(contactNumbersList.get(i))
-                        && (!userProfileData.getId().equals(currentUser.getUid()))) {
-                            contactNumbersList.remove(i);
-                            contacts.add(userProfileData);
+                                && (!userProfileData.getId().equals(currentUser.getUid()))) {
+                            boolean isAlreadyAdded = false;
+                            for (userProfile tempProfile: contacts) {
+                                if (tempProfile.getId().equals(userProfileData.getId())) {
+                                    isAlreadyAdded = true;
+                                }
+                            }
+                            if (!isAlreadyAdded) {
+                                contacts.add(userProfileData);
+                            }
                         }
                     }
                 }
+
+                Log.d("CONTACTS BRO",contacts.toString());
 
                 adapter = new searchContactAdapter(contacts, search_contacts.this);
                 lm = new LinearLayoutManager(search_contacts.this);
@@ -186,17 +196,20 @@ public class search_contacts extends AppCompatActivity {
         contactNumbersList = new ArrayList<>();
 
         final Cursor contactNumbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        assert contactNumbers != null;
         while (contactNumbers.moveToNext())
         {
             //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = contactNumbers.getString(contactNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
+            phoneNumber = phoneNumber.replace("+92", "0");
+            phoneNumber = phoneNumber.replaceAll(" ", "");
             contactNumbersList.add(phoneNumber);
+
         }
         contactNumbers.close();
 
+
         requestContactPermission();
+
 
         search_ac_asc.addTextChangedListener(new TextWatcher() {
             @Override
@@ -225,13 +238,5 @@ public class search_contacts extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent backBtnIntent = new Intent(search_contacts.this,users_chat_list.class);
-        startActivity(backBtnIntent);
-        finish();
     }
 }

@@ -56,7 +56,7 @@ public class users_chat_list extends AppCompatActivity {
     private TextView name, email;
     CircleImageView dp,dpSearchBar;
     ImageButton search;
-    AutoCompleteTextView searchBar;
+    TextView searchBar;
 
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -92,11 +92,8 @@ public class users_chat_list extends AppCompatActivity {
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         final userProfile userProfileData = data.getValue(userProfile.class);
                         for (int i=0 ;i<contactNumbersList.size();i++) {
-                            assert userProfileData != null;
                             if (userProfileData.getPhoneNumber().equals(contactNumbersList.get(i))
                                     && (!userProfileData.getId().equals(currentUser.getUid()))) {
-
-                                contactNumbersList.remove(i);
 
                                 isChatRef = database.getReference("user_chats");
                                 if (userProfileData.getId().compareTo(currentUser.getUid()) >0) {
@@ -109,8 +106,16 @@ public class users_chat_list extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()) {
-                                            contacts.add(userProfileData);
-                                            adapter.notifyDataSetChanged();
+                                            boolean isAlreadyAdded = false;
+                                            for (userProfile tempProfile: contacts) {
+                                                if (tempProfile.getId().equals(userProfileData.getId())) {
+                                                    isAlreadyAdded = true;
+                                                }
+                                            }
+                                            if (!isAlreadyAdded) {
+                                                contacts.add(userProfileData);
+                                                adapter.notifyDataSetChanged();
+                                            }
                                         }
                                     }
 
@@ -277,7 +282,6 @@ public class users_chat_list extends AppCompatActivity {
             public void onClick(View v) {
                 Intent searchContactsIntent = new Intent (users_chat_list.this,search_contacts.class);
                 startActivity(searchContactsIntent);
-                finish();
             }
         });
 
@@ -286,7 +290,6 @@ public class users_chat_list extends AppCompatActivity {
             public void onClick(View v) {
                 Intent searchContactsIntent = new Intent (users_chat_list.this,search_contacts.class);
                 startActivity(searchContactsIntent);
-                finish();
             }
         });
 
@@ -375,13 +378,13 @@ public class users_chat_list extends AppCompatActivity {
 
 
         final Cursor contactNumbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        assert contactNumbers != null;
         while (contactNumbers.moveToNext())
         {
             //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = contactNumbers.getString(contactNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-
+            phoneNumber = phoneNumber.replace("+92", "0");
+            phoneNumber = phoneNumber.replaceAll(" ", "");
             contactNumbersList.add(phoneNumber);
         }
         contactNumbers.close();
