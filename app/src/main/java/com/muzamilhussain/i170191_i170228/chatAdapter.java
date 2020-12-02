@@ -263,6 +263,7 @@ public class chatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             userProfile userData = dataSnapshot.getValue(userProfile.class);
+                            assert userData != null;
                             Picasso.get().load(userData.getProfilePicture()).into(receivedViewHolder.img_chat);
                         }
 

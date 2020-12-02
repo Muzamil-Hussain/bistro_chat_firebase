@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -122,6 +123,13 @@ public class chatActivity extends AppCompatActivity {
         }
 
 
+        adapter = new chatAdapter(chatMessages, chatActivity.this);
+        lm = new LinearLayoutManager(chatActivity.this);
+        ((LinearLayoutManager) lm).setStackFromEnd(true);
+        messageRecyclerView.setLayoutManager(lm);
+        messageRecyclerView.setAdapter(adapter);
+
+
         myDbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -155,7 +163,7 @@ public class chatActivity extends AppCompatActivity {
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && chatMessages.size() > 0) {
+                if (dataSnapshot.exists()) {
 
                     chatMessages.clear();
                     List<String> chatMessagesKeys = new ArrayList<>();
@@ -169,16 +177,18 @@ public class chatActivity extends AppCompatActivity {
                     String latestMessageKey = chatMessagesKeys.get(chatMessagesKeys.size() - 1);
                     message latestMessage = chatMessages.get(chatMessages.size() - 1);
 
-                    final String secondLastMessageKey = chatMessagesKeys.get(chatMessagesKeys.size() - 2);
-
                     if (!latestMessage.getSenderId().equals(currentUser.getUid())) {
                         chatReference.child(latestMessageKey).child("isSeen").setValue("true");
                         chatMessages.get(chatMessages.size() - 1).setIsSeen("true");
                     }
 
-                    if (latestMessage.getSenderId().equals(chatMessages.get(chatMessages.size() - 2).getSenderId())) {
-                        chatReference.child(secondLastMessageKey).child("isLast").setValue("false");
-                        chatMessages.get(chatMessages.size() - 2).setIsLast("false");
+
+                    if (dataSnapshot.getChildrenCount() > 1) {
+                        final String secondLastMessageKey = chatMessagesKeys.get(chatMessagesKeys.size() - 2);
+                        if (latestMessage.getSenderId().equals(chatMessages.get(chatMessages.size() - 2).getSenderId())) {
+                            chatReference.child(secondLastMessageKey).child("isLast").setValue("false");
+                            chatMessages.get(chatMessages.size() - 2).setIsLast("false");
+                        }
                     }
 
                     adapter.notifyDataSetChanged();
@@ -235,35 +245,32 @@ public class chatActivity extends AppCompatActivity {
 //        });
 
 
-        chatReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-
-                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-                        chatMessages.add(data.getValue(message.class));
-                        chatMessages.get(chatMessages.size()-1).setId(data.getKey());
-                    }
-                    adapter = new chatAdapter(chatMessages, chatActivity.this);
-                    lm = new LinearLayoutManager(chatActivity.this);
-                    ((LinearLayoutManager) lm).setStackFromEnd(true);
-                    messageRecyclerView.setLayoutManager(lm);
-                    messageRecyclerView.setAdapter(adapter);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(chatActivity.this,
-                        "Failed to retrieve messages",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
+//        chatReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//
+//                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                        chatMessages.add(data.getValue(message.class));
+//                        chatMessages.get(chatMessages.size()-1).setId(data.getKey());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Toast.makeText(chatActivity.this,
+//                        "Failed to retrieve messages",
+//                        Toast.LENGTH_LONG).show();
+//            }
+//        });
 
 
         back_btn_ac.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent backBtnIntent = new Intent (chatActivity.this, users_chat_list.class);
+                startActivity(backBtnIntent);
                 finish();
             }
         });
@@ -323,45 +330,54 @@ public class chatActivity extends AppCompatActivity {
 
         else {
 
-            Toast.makeText(chatActivity.this,"Helloooo",Toast.LENGTH_LONG).show();
-            final String imgMsg = data.getStringExtra("RESULTANTMSG");
+            if (data!=null) {
+                final String imgMsg = data.getStringExtra("RESULTANTMSG");
 
 
-            String uniqueID = UUID.randomUUID().toString();
+                String uniqueID = UUID.randomUUID().toString();
 
-            final String[] msgContent = imgMsg.split("--msgimg--");
+                final String[] msgContent = imgMsg.split("--msgimg--");
 
-            if (!msgContent[1].equals("nomsg")) {
-                containsMsg = true;
-            }
+                if (!msgContent[1].equals("nomsg")) {
+                    containsMsg = true;
+                }
 
-            mStorageRef.child(uniqueID).putFile(Uri.parse(msgContent[0]))
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
-                            task.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    //String dp = uri.toString();
-                                    imageUri = uri;
+                mStorageRef.child(uniqueID).putFile(Uri.parse(msgContent[0]))
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
+                                task.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        //String dp = uri.toString();
+                                        imageUri = uri;
 
-                                    String finalMsg;
-                                    if (containsMsg) {
-                                        finalMsg = imageUri.toString() +"--msgimg--"+ msgContent[1];
-                                    } else {
-                                        finalMsg = imageUri.toString() +"--msgimg--"+ "nomsg";
+                                        String finalMsg;
+                                        if (containsMsg) {
+                                            finalMsg = imageUri.toString() +"--msgimg--"+ msgContent[1];
+                                        } else {
+                                            finalMsg = imageUri.toString() +"--msgimg--"+ "nomsg";
+                                        }
+
+                                        singleMessage = new message(currentUser.getUid(),
+                                                userId,
+                                                finalMsg);
+                                        //chatReference.push().setValue(singleMessage);
+                                        chatReference.push().setValue(singleMessage);
                                     }
-
-                                    singleMessage = new message(currentUser.getUid(),
-                                            userId,
-                                            finalMsg);
-                                    //chatReference.push().setValue(singleMessage);
-                                    chatReference.push().setValue(singleMessage);
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+            }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent backBtnIntent = new Intent(chatActivity.this, users_chat_list.class);
+        startActivity(backBtnIntent);
+        finish();
     }
 }

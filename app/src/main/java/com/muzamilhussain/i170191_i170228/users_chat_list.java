@@ -92,8 +92,11 @@ public class users_chat_list extends AppCompatActivity {
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         final userProfile userProfileData = data.getValue(userProfile.class);
                         for (int i=0 ;i<contactNumbersList.size();i++) {
+                            assert userProfileData != null;
                             if (userProfileData.getPhoneNumber().equals(contactNumbersList.get(i))
                                     && (!userProfileData.getId().equals(currentUser.getUid()))) {
+
+                                contactNumbersList.remove(i);
 
                                 isChatRef = database.getReference("user_chats");
                                 if (userProfileData.getId().compareTo(currentUser.getUid()) >0) {
@@ -274,6 +277,7 @@ public class users_chat_list extends AppCompatActivity {
             public void onClick(View v) {
                 Intent searchContactsIntent = new Intent (users_chat_list.this,search_contacts.class);
                 startActivity(searchContactsIntent);
+                finish();
             }
         });
 
@@ -282,6 +286,7 @@ public class users_chat_list extends AppCompatActivity {
             public void onClick(View v) {
                 Intent searchContactsIntent = new Intent (users_chat_list.this,search_contacts.class);
                 startActivity(searchContactsIntent);
+                finish();
             }
         });
 
@@ -370,10 +375,13 @@ public class users_chat_list extends AppCompatActivity {
 
 
         final Cursor contactNumbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+        assert contactNumbers != null;
         while (contactNumbers.moveToNext())
         {
             //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = contactNumbers.getString(contactNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+
             contactNumbersList.add(phoneNumber);
         }
         contactNumbers.close();

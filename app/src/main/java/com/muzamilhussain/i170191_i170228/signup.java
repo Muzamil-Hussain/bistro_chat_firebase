@@ -49,7 +49,7 @@ public class signup extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        final String url = "http://192.168.43.173/bistro_chat/register.php";
+//        final String url = "http://192.168.43.173/bistro_chat/register.php";
 
 
         signIn.setOnClickListener(new View.OnClickListener() {

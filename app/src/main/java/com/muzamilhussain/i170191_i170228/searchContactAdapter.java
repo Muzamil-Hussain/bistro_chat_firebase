@@ -61,6 +61,7 @@ public class searchContactAdapter extends RecyclerView.Adapter<searchContactAdap
                 Intent chatIntent = new Intent(v.getContext(),chatActivity.class);
                 chatIntent.putExtra("USERID", userId);
                 c.startActivity(chatIntent);
+//                ((search_contacts)v.getContext()).finish();
             }
         });
     }

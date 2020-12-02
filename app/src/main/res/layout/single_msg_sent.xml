@@ -5,8 +5,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginRight="10dp"
-    android:layout_gravity="right"
-    android:gravity="end"
     android:id="@+id/sent_msg_rl"
     android:layout_marginEnd="10dp"
     tools:ignore="RtlHardcoded">
@@ -28,16 +26,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/msg_sent_ll"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="70dp"
-        android:layout_marginStart="70dp"
-        android:gravity="right">
+        android:layout_marginStart="70dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/chat_msg_sent_last"
             android:orientation="vertical"
-            android:gravity="right"
             android:id="@+id/sent_chat_msg_img_ll">
             <ImageView
                 android:layout_width="329dp"

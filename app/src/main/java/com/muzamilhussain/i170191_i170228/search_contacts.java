@@ -66,6 +66,7 @@ public class search_contacts extends AppCompatActivity {
                     for (int i=0 ;i<contactNumbersList.size();i++) {
                         if (userProfileData.getPhoneNumber().equals(contactNumbersList.get(i))
                         && (!userProfileData.getId().equals(currentUser.getUid()))) {
+                            contactNumbersList.remove(i);
                             contacts.add(userProfileData);
                         }
                     }
@@ -185,17 +186,17 @@ public class search_contacts extends AppCompatActivity {
         contactNumbersList = new ArrayList<>();
 
         final Cursor contactNumbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+        assert contactNumbers != null;
         while (contactNumbers.moveToNext())
         {
             //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = contactNumbers.getString(contactNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
             contactNumbersList.add(phoneNumber);
         }
         contactNumbers.close();
 
-
         requestContactPermission();
-
 
         search_ac_asc.addTextChangedListener(new TextWatcher() {
             @Override
@@ -224,5 +225,13 @@ public class search_contacts extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent backBtnIntent = new Intent(search_contacts.this,users_chat_list.class);
+        startActivity(backBtnIntent);
+        finish();
     }
 }

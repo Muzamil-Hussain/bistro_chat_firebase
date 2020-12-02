@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -99,19 +101,24 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter .MyVie
                         if (breakText[1].equals("nomsg")) {
                             holder.info.setText("Sent you an image, open to see.");
                         } else {
-                            holder.info.setText(breakText[1].substring(0,20));
+                            if (breakText[1].length() > 30) {
+                                holder.info.setText(breakText[1].substring(0, 30) + "...");
+                            }
+                            else {
+                                holder.info.setText(breakText[1]);
+                            }
                         }
 
                     } else {
-                        if (latestText.length() > 20) {
-                            holder.info.setText(latestText.substring(0,20));
+                        if (latestText.length() > 30) {
+                            holder.info.setText(latestText.substring(0,30) + "...");
                         }
                         else {
                             holder.info.setText(latestText);
                         }
                     }
 
-                    if (singleMessage.getIsSeen().equals("true")) {
+                    if (!singleMessage.getIsSeen().equals("true")) {
                         holder.info.setTypeface(null, Typeface.BOLD);
                     }
                     else {
@@ -191,12 +198,61 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter .MyVie
                 Intent chatIntent = new Intent(v.getContext(),chatActivity.class);
                 chatIntent.putExtra("USERID", userId);
                 c.startActivity(chatIntent);
+                ((users_chat_list)v.getContext()).finish();
             }
         });
 
         holder.singleChatRow.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                        v.getContext(),
+                        R.style.BottomSheetDialogTheme
+                );
+
+                final View bottomSheetView = LayoutInflater.from(c.getApplicationContext())
+                        .inflate(
+                                R.layout.delete_conv_view,
+                                null
+                        );
+
+                ImageButton hide_dcv;
+                Button delete_btn_dcv;
+
+
+                hide_dcv = bottomSheetView.findViewById(R.id.hide_dcv);
+                delete_btn_dcv = bottomSheetView.findViewById(R.id.delete_btn_dcv);
+
+
+                hide_dcv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+
+                delete_btn_dcv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+
+                        chatReference.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                bottomSheetDialog.dismiss();
+                                contacts.remove(position);
+                                notifyItemRemoved(position);
+                                Toast.makeText(v.getContext(),"Chat Deleted",Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+
+
                 return false;
             }
         });
